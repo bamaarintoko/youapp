@@ -267,9 +267,9 @@ const Menu = ({ label, component }: InterMenu) => {
         <div className="flex">
 
             <div className="w-28 flex items-center">
-                <p className="text-[13px] text-white/30">{label}</p>
+                <p className="text-[12px] text-white/30">{label}</p>
             </div>
-            <div className="grow">
+            <div className="flex-1">
                 {component}
                 {/* <AboutGeneralInput /> */}
             </div>

@@ -1,6 +1,7 @@
 'use client'
 import AboutSection from "@/components/AboutSection";
 import HomeHeader from "@/components/HomeHeader";
+import InstallPrompt from "@/components/InstallPrompt";
 import InterestSection from "@/components/InterestSection";
 import PhotoSection from "@/components/PhotoSection";
 import withAuth from "@/hoc/withAuth";
@@ -14,6 +15,7 @@ function Home() {
 				<AboutSection />
 				<InterestSection />
 			</div>
+			<InstallPrompt/>
 
 		</div>
 	);
