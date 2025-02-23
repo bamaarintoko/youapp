@@ -18,7 +18,7 @@ const withAuth = (WrappedComponent: React.FC) => {
                 if (!user) {
                     router.push("/auth/login"); // Redirect ke login jika belum login
                 }
-                console.log('withAuth : ',user)
+                // console.log('withAuth : ',user)
             });
 
             return () => unsubscribe();

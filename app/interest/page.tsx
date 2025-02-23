@@ -71,7 +71,7 @@ export default function PageInterest() {
 
                 <div
                     // style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-                    className="mt-6 w-full max-w-md p-2 bg-white/[0.06] rounded-lg flex flex-wrap gap-2"
+                    className="mt-6 w-full p-2 bg-white/[0.06] rounded-lg flex flex-wrap gap-2"
                     onClick={() => inputRef.current?.focus()}
                 >
                     {tags.map((tag, index) => (

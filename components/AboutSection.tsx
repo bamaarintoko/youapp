@@ -216,7 +216,7 @@ export default function AboutSection() {
                     {
                         !loading && !isEdit
                         &&
-                        <div onClick={() => setIsEdit(!isEdit)}>
+                        <div className="cursor-pointer" onClick={() => setIsEdit(!isEdit)}>
 
                             <EditPencil />
                         </div>
