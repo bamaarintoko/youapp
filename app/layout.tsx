@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
@@ -13,9 +13,24 @@ const geistMono = Geist_Mono({
 	subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+	themeColor: 'black',
+}
+
 export const metadata: Metadata = {
 	title: "YouApp",
 	description: "YouApp",
+	manifest: "/manifest.webmanifest",
+	// themeColor: "#000000",
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: "black-translucent",
+		title: "YouApp",
+	},
+	icons: {
+		icon: "/icons/icon-192.png",
+		apple: "/icons/apple-touch-icon.png",
+	},
 };
 
 export default function RootLayout({
