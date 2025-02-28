@@ -6,6 +6,7 @@ import { useFirestoreListener } from "@/lib/hook/useFirestoreListener";
 import { useEffect, useRef, useState } from "react";
 
 interface InterestUser {
+    [key: string]: unknown;
     tags: string[]
 }
 

@@ -26,6 +26,7 @@ type SelectHandler = (e: ChangeEvent<HTMLSelectElement>) => void;
 type InputHandlerWithField = (field: string) => (e: ChangeEvent<HTMLInputElement>) => void;
 
 export interface AboutUser {
+    [key: string]: unknown;
     name: string;
     birthday: string;
     gender: string;
