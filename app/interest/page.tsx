@@ -1,22 +1,28 @@
 'use client'
 import InterestHeader from "@/components/InterestHeader";
-import { saveInterestUser } from "@/lib/firebase/saveInterestUser";
-import { auth } from "@/lib/firebaseConfig";
-import { useInterestUserListener } from "@/lib/hook/useInterestUserLinster";
+import { useAuth } from "@/lib/hook/useAuth";
+import { useFirestoreAddOrUpdate } from "@/lib/hook/useFirestoreAddOrUpdate";
+import { useFirestoreListener } from "@/lib/hook/useFirestoreListener";
 import { useEffect, useRef, useState } from "react";
 
-export default function PageInterest() {
-    const { data } = useInterestUserListener();
-    const [tags, setTags] = useState<string[]>([]);
-    const [isLoading, setIsLoading] = useState(false)
+interface InterestUser {
+    tags: string[]
+}
 
+export default function PageInterest() {
+    const { user } = useAuth(); // Get the logged-in user
+    const [addOrUpdateInterest, { loading }] = useFirestoreAddOrUpdate<InterestUser>("interestUser");
+    const { data: interestUser } = useFirestoreListener<InterestUser>("interestUser", user?.uid);
+    const [tags, setTags] = useState<string[]>([]);
+
+    // const { data } = useInterestUserListener();
     const inputRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (data) {
-            setTags(data?.tags)
+        if (interestUser) {
+            setTags(interestUser?.tags)
         }
-    }, [data])
+    }, [interestUser])
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === "Enter" || e.key === ",") {
@@ -34,16 +40,11 @@ export default function PageInterest() {
     };
 
     const handleSaveInterest = async () => {
-        const user = auth.currentUser;
-        setIsLoading(true)
         try {
             if (user) {
-                await saveInterestUser(user.uid, tags);
-                setIsLoading(false)
+                await addOrUpdateInterest(user.uid, { tags });
             }
-
         } catch (error) {
-            setIsLoading(false)
             console.log("error : ", error);
 
         }
@@ -53,7 +54,7 @@ export default function PageInterest() {
             <InterestHeader onClick={handleSaveInterest} />
             <div className="px-6 pt-20">
                 {
-                    isLoading
+                    loading
                     &&
                     <div className="flex justify-center flex-col items-center">
                         <svg aria-hidden="true" className="w-6 h-6 text-gray-200 animate-spin  fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">

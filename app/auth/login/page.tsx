@@ -2,8 +2,10 @@
 import AuthButton from "@/components/AuthButton";
 import AuthInput from "@/components/AuthInput";
 import withNoAuth from "@/hoc/withNoAuth";
-import { loginWithUsernameOrEmail } from "@/lib/firebase/loginWithUsernameOrEmail";
+// import { useLoginWithUsernameOrEmail } from "@/lib/firebase/loginWithUsernameOrEmail";
+// import { loginWithUsernameOrEmail } from "@/lib/firebase/loginWithUsernameOrEmail";
 import { cekEmpty } from "@/lib/functions";
+import { useLoginWithUsernameOrEmail } from "@/lib/hook/useLoginWithUsernameOrEmail";
 import Link from "next/link";
 import { ChangeEvent, useState } from "react";
 
@@ -16,6 +18,7 @@ type FormState = {
 };
 type InputHandler = (field: string) => (e: ChangeEvent<HTMLInputElement>) => void;
 function PageLogin() {
+    const [login, { loading, error }] = useLoginWithUsernameOrEmail()
     const [form, setForm] = useState<FormState>({
         username: {
             value: '',
@@ -28,9 +31,9 @@ function PageLogin() {
             message: ''
         },
     })
-    const [isLoginFailied, setIsLoginFailed] = useState<boolean>(false)
-    const [message, setMessage] = useState<string>("")
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+    // const [isLoginFailied, setIsLoginFailed] = useState<boolean>(false)
+    // const [message, setMessage] = useState<string>("")
+    // const [isLoading, setIsLoading] = useState<boolean>(false)
     const handleInput: InputHandler = (field) => (e) => {
         setForm((prevForm) => ({
             ...prevForm,
@@ -44,7 +47,7 @@ function PageLogin() {
     }
 
     const handleLogin = async () => {
-        setIsLoading(true)
+        // setIsLoading(true)
         const hasError = cekEmpty(form)
 
         if (hasError) {
@@ -53,16 +56,16 @@ function PageLogin() {
         } else {
             // ✅ no error
             try {
-                await loginWithUsernameOrEmail(form.username.value, form.password.value);
+                await login(form.username.value, form.password.value);
                 // console.log("Login berhasil:", user);
-                setIsLoading(false)
+                // setIsLoading(false)
             } catch (err) {
                 updateFormField("username")
                 updateFormField("password")
                 // validateForm()
-                setIsLoginFailed(true)
-                setIsLoading(false)
-                setMessage(String(err))
+                // setIsLoginFailed(true)
+                // setIsLoading(false)
+                // setMessage(String(err))
                 console.log(err);
             }
         }
@@ -127,13 +130,13 @@ function PageLogin() {
                 <AuthInput isError={form.password.isError} value={form.password.value} onChange={handleInput('password')} type="password" id="Password" secure={true} placeholder="Enter Password" />
                 <div className="h-1" />
                 {
-                    isLoginFailied
+                    error
                     &&
                     <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 " role="alert">
-                        {message}.
+                        {error}.
                     </div>
                 }
-                <AuthButton isLoading={isLoading} onClick={handleLogin} label="Login" />
+                <AuthButton isLoading={loading} onClick={handleLogin} label="Login" />
             </div>
             <div className="flex items-center justify-center mt-10">
                 <p className="text-white text-[13px]">No Account? &nbsp;</p>

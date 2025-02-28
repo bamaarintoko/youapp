@@ -2,7 +2,7 @@
 import AuthButton from "@/components/AuthButton";
 import AuthInput from "@/components/AuthInput";
 import withNoAuth from "@/hoc/withNoAuth";
-import { registerUser } from "@/lib/firebase/addUser";
+import { useRegisterUser } from "@/lib/hook/useRegisterUser";
 import Link from "next/link";
 import { ChangeEvent, useState } from "react";
 
@@ -16,6 +16,7 @@ type FormState = {
 type InputHandler = (field: string) => (e: ChangeEvent<HTMLInputElement>) => void;
 
 function PageRegister() {
+    const [registerUser, { loading, error }] = useRegisterUser();
     const [form, setForm] = useState<FormState>({
         email: {
             value: '',
@@ -39,13 +40,10 @@ function PageRegister() {
         }
     })
 
-    const [isRegisterFailed, setIsRegisterFailed] = useState<boolean>(false)
-    const [message, setMessage] = useState<string>("")
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-
     const cekEmpty = () => {
         return Object.values(form).some(field => field.value.trim() === '');
     };
+
     const handleInput: InputHandler = (field) => (e) => {
         setForm((prevForm) => ({
             ...prevForm,
@@ -59,40 +57,23 @@ function PageRegister() {
     }
 
     const handleRegister = async () => {
-        setIsLoading(true)
         const hasErrors = cekEmpty();
         validateForm()
         if (hasErrors) {
             // ❌ Form has errors, run validate form for change state isError
             validateForm()
-            setIsLoading(false)
         } else {
             // ✅ no error
             if (validatePasswordMatch(form.password.value, form.confirm_password.value)) {
-                setIsRegisterFailed(false)
-                setMessage("")
                 const par = {
                     email: form.email.value,
                     username: form.username.value,
                     password: form.password.value
                 }
-                try {
-                    await registerUser(par);
-                    // console.log("User berhasil didaftarkan:", user);
-                    setIsLoading(false)
-                } catch (err) {
-                    setIsRegisterFailed(true)
-                    setMessage(String(err))
-                    setIsLoading(false)
-                    console.log('errooooor : ', (err))
-                    // setError(err.message);
-                }
+                await registerUser(par);
             } else {
-                setIsRegisterFailed(true)
-                setMessage("password missmatch")
                 updateFormField('password')
                 updateFormField('confirm_password')
-                console.log('not match')
             }
         }
     }
@@ -177,13 +158,13 @@ function PageRegister() {
                     type="password" id="Confirm Password" secure={true} placeholder="Confirm Password" />
                 <div className="h-1" />
                 {
-                    isRegisterFailed
+                    error
                     &&
                     <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 " role="alert">
-                        {message}.
+                        {error}
                     </div>
                 }
-                <AuthButton isLoading={isLoading} onClick={handleRegister} label="Register" />
+                <AuthButton isLoading={loading} onClick={handleRegister} label="Register" />
             </div>
             <div className="flex items-center justify-center mt-10">
                 <p className="text-white text-[13px]">Have an Account? &nbsp;</p>

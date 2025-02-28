@@ -1,10 +1,20 @@
-import { logoutUser } from "@/lib/firebase/logOut";
-import { useUserData } from "@/lib/hook/useUserData";
+import { useAuth } from "@/lib/hook/useAuth";
+import { useFirestoreListener } from "@/lib/hook/useFirestoreListener";
+import { useLogoutUser } from "@/lib/hook/useLogoutUser";
 import { ChevronLeftIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/solid";
+import { Timestamp } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 
+interface UserData {
+    email: string;
+    username: string;
+    createdAt: Timestamp;
+}
 export default function HomeHeader() {
-    const { userData } = useUserData();
+    const { user } = useAuth()
+    const { data: users } = useFirestoreListener<UserData>("users", user?.uid);
+    const [logout] = useLogoutUser()
+    // const { userData } = useUserData();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -22,12 +32,7 @@ export default function HomeHeader() {
     }, []);
 
     const handleLogout = async () => {
-        try {
-            await logoutUser();
-            //   router.push("/login"); // Redirect to login
-        } catch (error) {
-            console.error(error);
-        }
+        await logout();
     };
 
     return (
@@ -38,9 +43,9 @@ export default function HomeHeader() {
             </div>
             <div className="flex grow items-center justify-center">
                 {
-                    userData
+                    users
                     &&
-                    <p className="font-bold text-white text-[14px]">@{userData.username}</p>
+                    <p className="font-bold text-white text-[14px]">@{users.username}</p>
                 }
             </div>
             <div ref={dropdownRef} className="w-16 flex items-end justify-end relative">

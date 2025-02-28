@@ -9,9 +9,10 @@ import { formatBirthday, getChineseZodiac, getZodiacSign } from "@/lib/functions
 import SelectGender from "./SelectGender";
 import AddImage from "./AddImage";
 import { auth } from "@/lib/firebaseConfig";
-import { AboutUser, saveAboutUser } from "@/lib/firebase/saveAboutUser";
-import { useAboutUserListener } from "@/lib/hook/useAboutUserListener";
 import Loading from "./Loading";
+import { useFirestoreAddOrUpdate } from "@/lib/hook/useFirestoreAddOrUpdate";
+import { useAuth } from "@/lib/hook/useAuth";
+import { useFirestoreListener } from "@/lib/hook/useFirestoreListener";
 
 type FormState = {
     [key: string]: {
@@ -24,10 +25,22 @@ type InputHandler = (e: ChangeEvent<HTMLInputElement>) => void;
 type SelectHandler = (e: ChangeEvent<HTMLSelectElement>) => void;
 type InputHandlerWithField = (field: string) => (e: ChangeEvent<HTMLInputElement>) => void;
 
+export interface AboutUser {
+    name: string;
+    birthday: string;
+    gender: string;
+    height: string;
+    weight: string;
+    horoscope: string;
+    zodiac: string;
+}
+
 export default function AboutSection() {
-    const { aboutUser } = useAboutUserListener();
+    const { user } = useAuth(); // Get the logged-in user
+    const [addOrUpdateAboutUser, { loading }] = useFirestoreAddOrUpdate<AboutUser>("aboutUser");
+    const { data: aboutUser } = useFirestoreListener<AboutUser>("aboutUser", user?.uid);
+
     const [isEdit, setIsEdit] = useState<boolean>(false)
-    const [loading, setLoading] = useState<boolean>(false)
     const [form, setForm] = useState<FormState>({
         "name": {
             value: "",
@@ -155,7 +168,7 @@ export default function AboutSection() {
     }
 
     const handleSaveAndUpdate = async () => {
-        setLoading(true)
+        // setLoading(true)
         const par = {
             "name": form.name.value,
             gender: form.gender.value,
@@ -168,14 +181,14 @@ export default function AboutSection() {
         const user = auth.currentUser;
         try {
             if (user) {
-                await saveAboutUser(user.uid, par);
+                await addOrUpdateAboutUser(user.uid, par);
                 setIsEdit(!isEdit)
-                setLoading(false)
+                // setLoading(false)
                 // console.log("User berhasil didaftarkan:");
             }
 
         } catch (error) {
-            setLoading(false)
+            // setLoading(false)
             console.log('error : ', error)
             // console.log("User gagal didaftarkan:");
 
